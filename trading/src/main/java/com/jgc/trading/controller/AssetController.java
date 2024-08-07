@@ -37,6 +37,7 @@ public class AssetController {
         return ResponseEntity.ok().body(asset);
     }
 
+    @GetMapping()
     public ResponseEntity<List<Asset>> getAssetsForUser(
             @RequestHeader("Authorization") String jwt
     ) throws Exception {

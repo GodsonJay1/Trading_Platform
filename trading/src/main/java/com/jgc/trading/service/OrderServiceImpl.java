@@ -110,7 +110,7 @@ public class OrderServiceImpl implements OrderService{
 
         double buyPrice = assetToSell.getBuyPrice();
 
-        if(assetToSell!=null) {
+        if(assetToSell != null) {
             OrderItem orderItem = createOrderItem(coin, quantity, buyPrice, sellPrice);
 
             Order order = createOrder(user, orderItem, OrderType.SELL);
