@@ -1,8 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar'
-import { DragHandleHorizontalIcon } from '@radix-ui/react-icons'
+import { DragHandleHorizontalIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import React from 'react'
+import Sidebar from './Sidebar'
+import { AvatarFallback } from '@/components/ui/avatar'
 
 const Navbar = () => {
   return (
@@ -26,14 +28,31 @@ const Navbar = () => {
                         </Avatar>
                         <div>
                             <span className='font-bold text-yellow-700'>Trust</span>
-                            <span>Trading</span>
+                            <span>Trade</span>
                         </div>
                     </div>
                 </SheetTitle>
                 </SheetHeader>
+                <Sidebar/>
             </SheetContent>
         </Sheet>
-
+        <p className='text-sm lg:text-base cursor-pointer'>
+            Trust Trade
+        </p>
+        <div className='p-0 ml-9'>
+            <Button variant="outline"
+            className="flex items-center gap-3">
+                <MagnifyingGlassIcon/>
+                <span>Search</span>
+            </Button>
+        </div>
+        </div>
+        <div>
+            <Avatar>
+                <AvatarFallback>
+                    T
+                </AvatarFallback>
+            </Avatar>
         </div>
 
     </div>
