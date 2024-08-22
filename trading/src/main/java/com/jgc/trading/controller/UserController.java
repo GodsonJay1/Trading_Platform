@@ -70,7 +70,7 @@ public class UserController {
         VerificationCode verificationCode = verificationCodeService.getVerificationCodeByUser(user.getId());
 
         String sendTo = verificationCode.getVerificationType().equals(VerificationType.EMAIL)?
-                String.valueOf(verificationCode.getEmail()) :verificationCode.getMobile();
+                verificationCode.getEmail() :verificationCode.getMobile();
 
         boolean isVerified = verificationCode.getOtp().equals(otp);
 

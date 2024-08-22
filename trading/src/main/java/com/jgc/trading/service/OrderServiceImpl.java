@@ -143,6 +143,9 @@ public class OrderServiceImpl implements OrderService{
     @Override
     @Transactional
     public Order processOrder(Coin coin, double quantity, OrderType orderType, User user) throws Exception {
+        if (orderType == null) {
+            throw new Exception("OrderType must not be null");
+        }
         if(orderType.equals(OrderType.BUY))
             return buyAsset(coin, quantity, user);
 

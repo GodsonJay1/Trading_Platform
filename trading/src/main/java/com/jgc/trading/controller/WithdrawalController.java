@@ -1,8 +1,11 @@
 package com.jgc.trading.controller;
 
+import com.jgc.trading.domain.WalletTransactionType;
 import com.jgc.trading.model.User;
 import com.jgc.trading.model.Wallet;
+import com.jgc.trading.model.WalletTransaction;
 import com.jgc.trading.model.Withdrawal;
+import com.jgc.trading.service.TransactionService;
 import com.jgc.trading.service.UserService;
 import com.jgc.trading.service.WalletService;
 import com.jgc.trading.service.WithdrawalService;
@@ -26,6 +29,9 @@ public class WithdrawalController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TransactionService transactionService;
+
     @PostMapping("/api/withdrawal/{amount}")
     public ResponseEntity<?> withdrawalRequest(
             @PathVariable Long amount,
@@ -36,6 +42,14 @@ public class WithdrawalController {
         Withdrawal withdrawal = withdrawalService.requestWithdrawal(amount, user);
 
         walletService.addBalance(userWallet, -withdrawal.getAmount());
+
+        WalletTransaction walletTransaction = transactionService.createTransaction(
+                userWallet,
+                WalletTransactionType.WITHDRAWAL,
+                null,
+                "Bank account withdrawal",
+                withdrawal.getAmount()
+        );
 
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }

@@ -17,7 +17,7 @@ public class VerificationCode {
     @OneToOne
     private User user;
 
-    private User email;
+    private String email;
 
     private String mobile;
 

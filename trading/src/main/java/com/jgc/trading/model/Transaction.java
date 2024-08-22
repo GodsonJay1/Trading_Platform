@@ -7,17 +7,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-@Data
 @Entity
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WalletTransaction {
+public class Transaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -25,11 +26,14 @@ public class WalletTransaction {
 
     private WalletTransactionType type;
 
-    private LocalDate date;
+    @Column(nullable = false)
+    private Long amount;
 
     private Long receiverWalletId;
 
+    @Column(nullable = false)
     private String purpose;
 
-    private Long amount;
+    private LocalDateTime timestamp = LocalDateTime.now();
+
 }

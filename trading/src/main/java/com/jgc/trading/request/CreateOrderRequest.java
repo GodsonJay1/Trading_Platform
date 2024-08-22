@@ -10,5 +10,5 @@ public class CreateOrderRequest {
 
     private double quantity;
 
-    private OrderType ordertype;
+    private OrderType orderType;
 }

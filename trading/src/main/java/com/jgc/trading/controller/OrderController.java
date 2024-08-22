@@ -9,7 +9,6 @@ import com.jgc.trading.service.CoinService;
 import com.jgc.trading.service.OrderService;
 import com.jgc.trading.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +38,10 @@ public class OrderController {
         User user = userService.findUserProfileByJwt(jwt);
         Coin coin = coinService.findById(req.getCoinId());
 
-        Order order = orderService.processOrder(coin, req.getQuantity(), req.getOrdertype(), user);
+        Order order = orderService.processOrder(coin,
+                req.getQuantity(),
+                req.getOrderType(),
+                user);
 
         return ResponseEntity.ok(order);
     }
