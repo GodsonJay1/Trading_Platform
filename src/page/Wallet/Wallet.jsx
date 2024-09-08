@@ -6,8 +6,47 @@ import TopupForm from "./TopupForm"
 import WithdrawalForm from "./WithdrawalForm"
 import TransferForm from "./TransferForm"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useDispatch, useSelector } from "react-redux"
+import { useEffect } from "react"
+import { depositMoney, getUserWallet, getWalletTransactions } from "@/State/Wallet/Action"
+import { useLocation, useNavigate } from "react-router-dom"
+
+function useQuery(){
+  return new URLSearchParams(useLocation().search)
+}
 
 const Wallet = () => {
+  const dispatch = useDispatch()
+  const {wallet} = useSelector(store=>store)
+  const query = useQuery()
+  const orderId = query.get("order_id")
+  const paymentId = query.get("payment_id")
+  const paystackPaymentId = query.get("reference")
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    handleFetchUserWallet()
+    handleFetchWalletTransactions()
+  },[])
+
+  useEffect(() => {
+    
+    if(orderId){
+      dispatch(depositMoney({jwt:localStorage.getItem("jwt"),
+        orderId,
+        paymentId:paystackPaymentId || paymentId,
+        navigate
+      }))
+    }
+  }, [orderId, paymentId, paystackPaymentId])
+
+  const handleFetchUserWallet = () => {
+    dispatch(getUserWallet(localStorage.getItem("jwt")))
+  }
+
+  const handleFetchWalletTransactions = () => {
+    dispatch(getWalletTransactions({jwt:localStorage.getItem("jwt")}))
+  }
   return (
     <div className="flex flex-col items-center">
       <div className="pt-10 w-full lg:w-[60%]">
@@ -22,14 +61,14 @@ const Wallet = () => {
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     <p className="text-gray-200 text-sm">
-                      #A698243G
+                      #{wallet.userWallet?.id}
                     </p>
                     <CopyIcon className="cursor-pointer hover:text-slate-300"/>
                   </div>
                 </div>
               </div>
               <div>
-                <ReloadIcon className="w-6 h-6 cursor-pointer hover:text-gray-300"/>
+                <ReloadIcon onClick={handleFetchUserWallet} className="w-6 h-6 cursor-pointer hover:text-gray-300"/>
               </div>
             </div>
           </CardHeader>
@@ -37,7 +76,7 @@ const Wallet = () => {
             <div className="flex items-center">
               <DollarSign/>
               <span className="text-2xl font-semibold">
-                20000
+                {wallet.userWallet?.balance}
               </span>
             </div>
             <div className="flex gap-7 mt-5">
@@ -101,11 +140,13 @@ const Wallet = () => {
         <div className="py-5 pt-10">
           <div className="flex gap-2 items-center pb-5">
             <h1 className="text-2xl font-semibold">History</h1>
-            <UpdateIcon className="h-7 w-7 cursor-pointer hover:text-gray-400"/>
+            <UpdateIcon 
+            onClick={handleFetchWalletTransactions} 
+            className="h-7 w-7 cursor-pointer hover:text-gray-400"/>
           </div>
 
           <div className="space-y-5">
-            {[1,1,1,1,1,1].map((item, i) => 
+            {wallet.transactions.map((item, i) => 
             <div key={i}>
             <Card className="px-5 flex justify-between items-center p-2">
               <div className="flex items-center gap-5">
@@ -117,13 +158,13 @@ const Wallet = () => {
                 </Avatar>
 
                 <div className="space-y-1">
-                  <h1>Buy Asset</h1>
-                  <p className="text-sm text-gray-500">2024-08-27</p>
+                  <h1>{item.type}</h1>
+                  <p className="text-sm text-gray-500">{item.date}</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-green-500">1000 USD</p>
+                <p className="text-green-500">{item.amount} USD</p>
               </div>
             </Card>
           </div>)}

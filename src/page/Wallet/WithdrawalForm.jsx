@@ -1,10 +1,14 @@
 import { Button } from '@/components/ui/button'
 import { DialogClose } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { withdrawalRequest } from '@/State/Withdrawal/Action'
 import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const WithdrawalForm = () => {
   const [amount, setAmount] = useState("")
+  const dispatch = useDispatch()
+  const {wallet, withdrawal} = useSelector(store=>store)
 
   const handleChange = (e) => {
     setAmount(e.target.value)
@@ -15,7 +19,17 @@ const WithdrawalForm = () => {
   }
 
   const handleSubmit = (e) => {
+    dispatch(withdrawalRequest({amount,jwt:localStorage.getItem("jwt")}))
     console.log(amount)
+  }
+
+  const formatAccountNumber = (accountNumber) => {
+    if (accountNumber && accountNumber.length > 4) {
+      const maskedPart = '*'.repeat(accountNumber.length - 4)
+      const visiblePart = accountNumber.slice(-4)
+      return `${maskedPart}${visiblePart}`
+    }
+    return accountNumber;
   }
 
   return (
@@ -23,7 +37,7 @@ const WithdrawalForm = () => {
       <div className='flex justify-between items-center 
       rounded-md bg-slate-900 text-xl font-bold px-5 py-4'>
         <p>Available Balance</p>
-        <p>$20000</p>
+        <p>${wallet.userWallet.balance}</p>
       </div>
       <div className='flex flex-col items-center'>
         <h1>Enter Withdrawal Amount</h1>
@@ -45,8 +59,8 @@ const WithdrawalForm = () => {
           className='h-8 w-8'
           src='https://png.pngtree.com/png-vector/20190302/ourmid/pngtree-vector-bank-icon-png-image_735750.jpg' alt=''/>
           <div>
-            <p className='text-xl font-bold'>Trust Bank</p>
-            <p className='text-xs'>************1634</p>
+            <p className='text-xl font-bold'>{withdrawal.paymentDetails?.bankName}</p>
+            <p className='text-xs'>{withdrawal.paymentDetails ? formatAccountNumber(withdrawal.paymentDetails?.accountNumber) : ''}</p>
           </div>
         </div>
       </div>

@@ -1,16 +1,34 @@
 import { Button } from '@/components/ui/button'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AssetTable from './AssetTable'
 import StockChart from './StockChart'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Cross1Icon, DotIcon } from '@radix-ui/react-icons'
 import { MessageCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { useDispatch, useSelector } from 'react-redux'
+import { getCoinList, getTop50CoinList } from '@/State/Coin/Action'
+
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+  } from '@/components/ui/pagination'
+  
 
 const Home = () => {
     const [category, setCategory] = useState("all")
+    const [currentPage, setCurrentPage] = useState(1)
     const [inputValue, setInputValue] = useState("")
     const [isBotReleased, setIsBotReleased] = useState(false)
+    const {coin, totalPages} = useSelector(store=>store)
+    const {coinDetails} = useSelector((store)=>store.coin)
+
+    const dispatch = useDispatch()
 
     const handleBotRelease = () => setIsBotReleased(!isBotReleased)
 
@@ -29,12 +47,26 @@ const Home = () => {
         setInputValue("")
     }
 
+    useEffect(() => {
+        dispatch(getTop50CoinList())
+    },[category])
+
+    useEffect(() => {
+        dispatch(getCoinList(currentPage))
+    },[currentPage])
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1){
+            setCurrentPage(newPage)
+        }
+    }
+
 
   return (
     <div className='relative'>
         <div className='lg:flex'>
             <div className='lg:w-[50%] lg:border-r'>
-                <div className='p-3 flex items-center gap-4'>
+                <div className='p-1 flex items-center gap-4'>
                     <Button onClick={() => handleCategory("all")} 
                     variant={category == "all" ? "default" : "outline"} 
                     className="rounded-full">
@@ -59,31 +91,79 @@ const Home = () => {
                         Top Losers
                     </Button>
                 </div>
-                <AssetTable/>
+                <AssetTable coin={category=="all"?coin.coinList:coin.top50} category={category}/>
+                <div>
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                            <PaginationPrevious 
+                            href="#" 
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                            />
+                            </PaginationItem>
+                            {currentPage > 1 && (
+                                <PaginationItem>
+                                <PaginationLink 
+                                href="#"
+                                onClick={() => handlePageChange(currentPage -1)}> 
+                                    {currentPage - 1}
+                                </PaginationLink>
+                                </PaginationItem>
+                            )}
+                            <PaginationItem>
+                            <PaginationLink 
+                            href="#"
+                            className='active'> 
+                                {currentPage}
+                            </PaginationLink>
+                            </PaginationItem>
+                            {currentPage < totalPages && (
+                                <PaginationItem>
+                                <PaginationLink 
+                                href="#"
+                                onClick={handlePageChange(currentPage + 1)}> 
+                                    {currentPage + 1}
+                                </PaginationLink>
+                                </PaginationItem>
+                            )}
+                            {currentPage < totalPages -1 && (
+                                <PaginationItem>
+                                <PaginationEllipsis />
+                                </PaginationItem>
+                            )}
+                            <PaginationItem>
+                            <PaginationNext href="#"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                             />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+
+                </div>
             </div>
-            <div className='hidden lg:block lg:w-[50%] p-5'>
-                <StockChart/>
+            <div className='hidden lg:block lg:w-[50%] p-2'>
+                <StockChart coinId={"bitcoin"}/>
                 <div className='flex gap-5 items-center'>
                     <div>
                         <Avatar>
-                            <AvatarImage src={
-                                "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png?1696501628"
-                            }/>
+                            <AvatarImage src={coinDetails?.image.large}/>
                         </Avatar>
                     </div>
                     <div>
                         <div className='flex items-center gap-2'>
-                            <p>ETH</p>
+                            <p>{coinDetails?.symbol.toUpperCase()}</p>
                             <DotIcon className='text-gray-400'/>
-                            <p className='text-gray-400'>Ethereum</p>
+                            <p className='text-gray-400'>{coinDetails?.name}</p>
                         </div>
                         <div className='flex items-end gap-2'>
                             <p className='text-xl font-bold'>
-                                2677.64
+                                ${coinDetails?.market_data.current_price.usd}
                             </p>
                             <p className='text-red-600'>
-                                <span>5531024186</span>
-                                <span>(1.74725)</span>
+                                <span>{coinDetails?.market_data.market_cap_change_24h}</span>
+                                <span>({coinDetails?.market_data.market_cap_change_percentage_24h}%)</span>
                             </p>
                         </div>
                     </div>
@@ -91,7 +171,7 @@ const Home = () => {
             </div>
         </div>
         <section className='absolute bottom-5 right-5 z-40 flex flex-col 
-        justify-end items-end gap-2 '>
+        justify-end items-end gap-2'>
             {isBotReleased && 
             <div className='rounded-md w-[20rem] md:w-[25rem] lg:w-[25rem] 
             h-[70vh] bg-slate-800'>
@@ -142,7 +222,7 @@ const Home = () => {
             }
             <div className='relative w-[10rem] cursor-pointer group:'>
             <Button 
-            className="w-full h-[3rem] gap-2 items-center"
+            className="w-full h-[3rem] gap-2 items-center align-bottom"
             onClick={handleBotRelease}>
                 <MessageCircle 
                 size={80}

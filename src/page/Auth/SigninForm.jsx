@@ -1,10 +1,15 @@
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { login } from '@/State/Auth/Action'
 import React from 'react'
 import { useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const SigninForm = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const form = useForm({
     resolver:"",
     defaultValues:{
@@ -14,7 +19,8 @@ const SigninForm = () => {
 })
 
 const onSubmit = (data) => {
-    console.log(data)
+  dispatch(login({data,navigate}))
+  console.log(data)
 }
 
 return (
@@ -55,7 +61,7 @@ return (
 
             <Button type="submit"
             className="w-full py-5">
-              Sign Up
+              Login
             </Button>
         </form>
     </Form>

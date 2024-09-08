@@ -1,13 +1,57 @@
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { getAssetDetails } from '@/State/Asset/Action'
+import { payOrder } from '@/State/Order/Action'
+import { getUserWallet } from '@/State/Wallet/Action'
 import { DotIcon } from '@radix-ui/react-icons'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 const TradingForm = () => {
     const [orderType, setOrderType] = useState("BUY")
-    const handleChange = () => {
+    const [amount, setAmount] = useState(0)
+    const [quantity, setQuantity] = useState(0)
 
+    const {coin, wallet, asset} = useSelector(store=>store)
+
+    const dispatch = useDispatch()
+
+    const handleChange = (e) => {
+      const amount = e.target.value
+      setAmount(amount)
+
+      const volume = calculateBuyCost(
+        amount, 
+        coin.coinDetails.market_data.current_price.usd
+      )
+      setQuantity(volume)
+    }
+
+    const calculateBuyCost = (amount, price) => {
+      let volume = amount/price 
+      let decimalPlaces = Math.max(2,price.toString().split(".")[0].length)
+      return volume.toFixed(decimalPlaces)
+    }
+
+    useEffect(() => {
+      dispatch(getUserWallet(localStorage.getItem("jwt")))
+      dispatch(getAssetDetails({
+        coinId:coin.coinDetails?.id, 
+        jwt:localStorage.getItem("jwt")
+      }))
+    }, [])
+
+    const handleBuyCrypto = () => {
+      dispatch(payOrder({
+        jwt: localStorage.getItem("jwt"),
+        amount,
+        orderData:{
+          coinId: coin.coinDetails?.id,
+          quantity,
+          orderType
+        }
+      }))
     }
 
   return (
@@ -25,7 +69,7 @@ const TradingForm = () => {
 
                 <div>
                     <p className='border text-2xl flex justify-center items-center w-36 h-14 rounded-md'>
-                        4532
+                        {quantity}
                     </p>
                 </div>
             </div>
@@ -36,23 +80,23 @@ const TradingForm = () => {
           <div>
             <Avatar>
               <AvatarImage
-              src={"https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400"}
+              src={coin.coinDetails?.image.large}
               />
             </Avatar>
           </div>
 
           <div>
             <div className='flex items-center gap-2'>
-              <p>BTC</p>
+              <p>{coin.coinDetails?.symbol.toUpperCase()}</p>
               <DotIcon className='text-gray-400'/>
-              <p className='text-gray-400'>Bitcoin</p>
+              <p className='text-gray-400'>{coin.coinDetails?.name}</p>
             </div>
 
             <div className='flex items-end gap-2'>
-              <p className='text-xl font-bold'>$60540</p>
+              <p className='text-xl font-bold'>${coin.coinDetails?.market_data.current_price.usd}</p>
               <p className='text-red-600'>
-                <span>-133646366.695</span>
-                <span>(-0.29803%)</span>
+                <span>{coin.coinDetails?.market_data.market_cap_change_24h}</span>
+                <span>({coin.coinDetails?.market_data.market_cap_change_percentage_24h}%)</span>
               </p>
             </div>
           </div>
@@ -65,12 +109,14 @@ const TradingForm = () => {
         </div>
 
         <div className='flex items-center justify-between'>
-          <p>{orderType=="BUY" ? "Available Case" : "Available Quantity"}</p>
-          <p>{orderType=="BUY" ? "200" : "31.76"}</p>
+          <p>{orderType=="BUY" ? "Wallet Balance" : "Available Quantity"}</p>
+          <p>{orderType=="BUY" ? "$"+wallet.userWallet?.balance : asset.assetDetails?.quantity || 0}</p>
         </div>
 
         <div>
-          <Button className={`w-full py-6 
+          <Button 
+          onClick={handleBuyCrypto}
+          className={`w-full py-6 
             ${orderType=="SELL"?"bg-red-600 text-white" : " bg-green-600 text-white"}`}>
             {orderType}
           </Button>
