@@ -39,7 +39,6 @@ public class PaymentServiceImpl implements PaymentService {
     private String paystackSecretKey;
 
     private static final String PAYSTACK_CREATE_PAYMENT_LINK_URL = "https://api.paystack.co/transaction/initialize";
-    private View error;
 
 
     @Override
@@ -143,7 +142,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentLinkRequest.put("reminder_enabled", true);
 
             // Set the callback URL and method
-            paymentLinkRequest.put("callback_url", "http://localhost:5455/walletwallet?order_id="+orderId);
+            paymentLinkRequest.put("callback_url", "http://localhost:5173/wallet?order_id="+orderId);
             paymentLinkRequest.put("callback_method", "get");
 
             // Add the JSON payload to the request
@@ -190,8 +189,8 @@ public class PaymentServiceImpl implements PaymentService {
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5455/wallet?order_id="+orderId)
-                .setCancelUrl("http://localhost:5455/payment/cancel")
+                .setSuccessUrl("http://localhost:5173/wallet?order_id="+orderId)
+                .setCancelUrl("http://localhost:5173/payment/cancel")
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(
