@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react'
 import AssetTable from './AssetTable'
 import StockChart from './StockChart'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { Cross1Icon, DotIcon } from '@radix-ui/react-icons'
-import { MessageCircle } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { DotIcon } from '@radix-ui/react-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { getCoinList, getTop50CoinList } from '@/State/Coin/Action'
 
@@ -18,33 +16,19 @@ import {
     PaginationNext,
     PaginationPrevious,
   } from '@/components/ui/pagination'
+import Chatbot from '../Chatbox/Chatbot'
   
 
 const Home = () => {
     const [category, setCategory] = useState("all")
     const [currentPage, setCurrentPage] = useState(1)
-    const [inputValue, setInputValue] = useState("")
-    const [isBotReleased, setIsBotReleased] = useState(false)
     const {coin, totalPages} = useSelector(store=>store)
     const {coinDetails} = useSelector((store)=>store.coin)
 
     const dispatch = useDispatch()
 
-    const handleBotRelease = () => setIsBotReleased(!isBotReleased)
-
     const handleCategory = (value) => {
         setCategory(value)
-    }
-
-    const handleChange = (e) => {
-        setInputValue(e.target.value)
-    }
-
-    const handleKeyPress = (event) => {
-        if(event.key == "Enter"){
-            console.log(inputValue)
-        }
-        setInputValue("")
     }
 
     useEffect(() => {
@@ -170,70 +154,9 @@ const Home = () => {
                 </div>
             </div>
         </div>
-        <section className='absolute bottom-5 right-5 z-40 flex flex-col 
-        justify-end items-end gap-2'>
-            {isBotReleased && 
-            <div className='rounded-md w-[20rem] md:w-[25rem] lg:w-[25rem] 
-            h-[70vh] bg-slate-800'>
-                <div className='flex justify-between items-center border-b px-6 h-[12%]'>
-                    <p>Chat Bot</p>
-                    <Button 
-                    onClick={handleBotRelease}
-                    variant="ghost" size="icon">
-                        <Cross1Icon/>
-                    </Button>
-                </div>
-
-                <div className='h-[76%] flex flex-col overflow-y-auto gap-5 px-5 py-2 scroll-container scrollbar-hide'>
-                    <div className='self-start pb-5 w-auto'>
-                    <div className='justify-end self-end px-5 py-2 rounded-md bg-slate-600 w-auto'>
-                        <p>Hi, Jay</p>
-                        <p>You can ask crypto related questions</p>
-                        <p>like, price, market cap extra...</p>
-                    </div>
-                    </div>
-
-                    {
-                        [1,1,1,1].map((item, i)=> (
-                            <div
-                            key={i} 
-                            className={`${
-                            i%2==0 ? "self-start": "self-end"} "pb-5 w-auto'`}>
-                            {i%2==0?
-                            <div className='justify-end self-end px-5 py-2 rounded-md bg-slate-600 w-auto'>
-                                <p>prompt who are you?</p>
-                            </div> :
-                            <div className='justify-end self-end px-5 py-2 rounded-md bg-slate-600 w-auto'>
-                                <p>ans Hi, I'm Jay</p>
-                            </div>}
-                            </div>
-                        ))
-                    }      
-                </div>
-                <div className='h-[12%] border-t'>
-                    <Input className="w-full h-full order-none outline-none"
-                    placeholder="write prompt"
-                    onChange={handleChange}
-                    value={inputValue}
-                    onKeyPress={handleKeyPress} />
-                </div>
-            
-            </div>
-            }
-            <div className='relative w-[10rem] cursor-pointer group:'>
-            <Button 
-            className="w-full h-[3rem] gap-2 items-center align-bottom"
-            onClick={handleBotRelease}>
-                <MessageCircle 
-                size={80}
-                className='fill-[#eeeef0] -rotate-90 stroke-none 
-                group-hover:fill-[#3e1270]'/>
-                <span className='text-2xl'>
-                    Chat Box
-                </span>
-            </Button>
-            </div>
-        </section>
+        <div  className='flex items-center gap-4'>
+            <Chatbot/>
+        </div>
     </div>
   )
 }
