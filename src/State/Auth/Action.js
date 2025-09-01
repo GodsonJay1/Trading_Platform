@@ -14,7 +14,7 @@ export const register=(userData) => async(dispatch) => {
 
     dispatch({type:REGISTER_REQUEST})
 
-    const baseUrl = "http://localhost:5455"
+    const baseUrl = "http://192.168.56.12:5455"
 
     try{
         const response = await axios.post(`${baseUrl}/auth/signup`,userData);
@@ -34,7 +34,7 @@ export const login=(userData) => async(dispatch) => {
 
     dispatch({type:LOGIN_REQUEST})
 
-    const baseUrl = "http://localhost:5455"
+    const baseUrl = "http://192.168.56.12:5455"
 
     try{
         const response = await axios.post(`${baseUrl}/auth/signin`,userData.data);
@@ -55,7 +55,7 @@ export const getUser=(jwt) => async(dispatch) => {
 
     dispatch({type:GET_USER_REQUEST})
 
-    const baseUrl = "http://localhost:5455"
+    const baseUrl = "http://192.168.56.12:5455"
 
     try{
         const response = await axios.get(`${baseUrl}/api/users/profile`,{
