@@ -18,12 +18,26 @@ public class AppConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.sessionManagement(management->management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(Authorize->Authorize.requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll())
-                .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        http
+            // Stateless sessions for JWT
+            .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // Authorization rules
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/auth/**", "/api/health").permitAll()  // allow signup, signin, health
+                .requestMatchers("/api/**").authenticated()             // JWT required for /api
+                .anyRequest().permitAll()                                // permit all others
+            )
+            
+            // JWT Filter
+            .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
+            
+            // Disable CSRF for testing
+            .csrf(csrf -> csrf.disable())
+            
+            // Enable CORS
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
         return http.build();
     }
 
