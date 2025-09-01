@@ -35,6 +35,7 @@ public class AppConfig {
                 CorsConfiguration config = new CorsConfiguration();
                 config.setAllowedOrigins(
                         Arrays.asList(
+                            "http://192.168.56.11", // frontend VM
                                 "http://localhost:5173",
                                 "http://localhost:3000"
                         )
