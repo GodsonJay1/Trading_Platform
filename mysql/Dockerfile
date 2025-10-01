@@ -1,8 +1,8 @@
 FROM mysql:8
 
-# Copy your initialization scripts
-COPY init.sql /docker-entrypoint-initdb.d/
+# Set environment variables (root user + default DB)
+ENV MYSQL_ROOT_PASSWORD=root
+ENV MYSQL_DATABASE=trust_trading
 
-# Expose default MySQL port
-EXPOSE 3306
-CMD
+# Copy initialization SQL scripts into the container
+COPY init.sql /docker-entrypoint-initdb.d/

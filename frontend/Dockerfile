@@ -3,12 +3,16 @@ FROM node:20 AS build
 
 WORKDIR /app
 
+# Copy package.json and package-lock.json first (for caching)
 COPY package*.json ./
-COPY tailwind.config.js postcss.config.js vite.config.js ./
-COPY public ./public
-COPY src ./src
 
+# Install dependencies
 RUN npm install
+
+# Copy the rest of the files
+COPY . .
+
+# Build
 RUN npm run build
 
 # Stage 2: Serve with Nginx
@@ -23,4 +27,3 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
-

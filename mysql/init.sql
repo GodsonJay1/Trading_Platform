@@ -1,6 +1,17 @@
--- mysql/init.sql
 CREATE DATABASE IF NOT EXISTS trust_trading;
 USE trust_trading;
 
--- create a demo user/table if required
--- CREATE TABLE IF NOT EXISTS sample (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100));
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
