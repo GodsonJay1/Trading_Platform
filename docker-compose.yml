@@ -1,60 +1,38 @@
-version: '3.8'
-
 services:
   db:
-    image: mysql:8
+    build:
+      context: ./mysql
+      dockerfile: Dockerfile
+    image: godsonjay1/trading-db:latest
     container_name: trading-db
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: trust_trading
     volumes:
       - db_data:/var/lib/mysql
-      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro  # optional init script
-    ports:
-      - "3306:3306"
-
-  cache:
-    image: memcached:latest
-    container_name: trading-cache
-    ports:
-      - "11211:11211"
-
-  mq:
-    image: rabbitmq:3-management
-    container_name: trading-mq
-    environment:
-      RABBITMQ_DEFAULT_USER: test
-      RABBITMQ_DEFAULT_PASS: test
-    ports:
-      - "5672:5672"
-      - "15672:15672"
 
   backend:
     build:
-      context: https://github.com/GodsonJay1/Trading_Platform.git#backend
+      context: ./backend/trading
       dockerfile: Dockerfile
+    image: godsonjay1/trading-backend:latest
     container_name: trading-backend
     depends_on:
       - db
-      - cache
-      - mq
     ports:
       - "5455:5455"
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/trust_trading
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      MEMCACHED_ACTIVE_HOST: cache
-      MEMCACHED_ACTIVE_PORT: 11211
-      RABBITMQ_ADDRESS: mq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: test
-      RABBITMQ_PASSWORD: test
 
   frontend:
     build:
-      context: https://github.com/GodsonJay1/Trading_Platform.git#frontend
+      context: ./frontend
       dockerfile: Dockerfile
+    image: godsonjay1/trading-frontend:latest
     container_name: trading-frontend
     depends_on:
       - backend
@@ -63,3 +41,4 @@ services:
 
 volumes:
   db_data:
+
