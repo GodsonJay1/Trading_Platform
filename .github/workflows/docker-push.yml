@@ -1,0 +1,44 @@
+name: Docker Hub Push
+
+on:
+  push:
+    branches:
+      - docker  # or your default branch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/trading
+          file: ./backend/trading/Dockerfile
+          push: true
+          tags: godsonjay1/trading-backend:latest
+
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: godsonjay1/trading-frontend:latest
+
+      - name: Build and push db
+        uses: docker/build-push-action@v5
+        with:
+          context: ./mysql
+          file: ./mysql/Dockerfile
+          push: true
+          tags: godsonjay1/trading-db:latest
