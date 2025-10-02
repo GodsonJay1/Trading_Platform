@@ -3,7 +3,7 @@ name: Docker Hub Push
 on:
   push:
     branches:
-      - docker  # or your default branch
+      - docker
 
 jobs:
   build-and-push:
