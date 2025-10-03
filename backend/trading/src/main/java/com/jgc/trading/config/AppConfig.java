@@ -36,8 +36,7 @@ public class AppConfig {
                 config.setAllowedOrigins(
                         Arrays.asList(
                                 "http://localhost:5173",
-                                "http://localhost:3000",
-                                "http://trust-trading-alb-241079600.us-east-1.elb.amazonaws.com"
+                                "http://localhost:3000"
                         )
                 );
                 config.setAllowedMethods(Collections.singletonList("*"));
